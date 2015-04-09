@@ -1,0 +1,4 @@
+xattr
+flask
+pygments
+pygments-style-github

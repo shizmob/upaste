@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+         <title>mlg elite paste</title>
+         <meta charset="utf-8" />
+         <meta name="robots" content="noindex,nofollow" />
+         <style type="text/css">body, textarea { width: 100%; margin: 0; overflow-x: hidden; } textarea { padding: 10px; } input[type=password] { margin-left: 10px } #msg { margin: 0; padding: 8px; font-family: Helvetica, Arial, sans-serif;background-color: lightpink; border: 1px solid crimson; font-size: 14px; }</style>
+    </head>
+
+    <body>
+        <form method="post" action="{{ url_for('paste') }}">
+            <textarea id="input" name="txt" rows="55" cols="200">{% if contents %}{{ contents }}{% endif %}</textarea><br />
+            <input type="password" name="pw" placeholder="password" value="{{ password }}" />
+            {% if original %}
+            <input type="hidden" name="original" value="{{ original }}" />
+            {% endif %}
+            <select name="type">
+            {% for language, full_language in top_languages %}
+                <option value="{{ language }}">{{ full_language }}</option>
+            {% endfor %}
+                <option>----------------</option>
+            {% for language, full_language in languages %}
+                <option value="{{ language }}"{% if original_language == language %} selected{% endif %}>{{ full_language }}</option>
+            {% endfor %}
+            </select>
+            <input type="submit" value="paste" />
+        </form>
+        <script type="text/javascript">
+        window.onresize = function() {
+            var x = document.getElementById('input');
+            x.style.width = String(window.innerWidth) + 'px';
+            x.style.height = String(window.innerHeight - 50 - 32 * (document.getElementById('msg') != null)) + 'px'; 
+        };
+        window.onresize();
+        </script>
+    </body>
+</html>
+

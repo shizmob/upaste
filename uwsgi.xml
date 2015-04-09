@@ -1,0 +1,8 @@
+<uwsgi>
+	<chdir>/serv/www-data/txt.shiz.me</chdir>
+	<pythonpath>/serv/www-data/txt.shiz.me</pythonpath>
+	<module>upaste</module>
+	<callable>app</callable>
+	<uid>nginx</uid>
+	<gid>nginx</gid>
+</uwsgi>
