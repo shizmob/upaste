@@ -21,7 +21,8 @@ editor uwsgi.xml
 # Restore xattrs not tracked by git.
 setfattr -n user.upaste.language -v python3 upaste/upaste.py
 
-# Now point a uwsgi instance to uwsgi.xml and you're done.
+# Now point a uwsgi instance to uwsgi.xml, and your web server's web root to upaste/plain/,
+# and you're done.
 ```
 
 License
