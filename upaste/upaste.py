@@ -14,8 +14,8 @@ from flask import Flask, abort, redirect, render_template, request, url_for
 app = Flask(__name__)
 
 
+@app.route('/repaste/<id>', endpoint='repaste')
 @app.route('/')
-@app.route('/repaste/<id>')
 def index(id=None):
 	if id:
 		id = sanitize_id(id)
