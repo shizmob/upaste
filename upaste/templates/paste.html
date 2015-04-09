@@ -26,7 +26,7 @@
             {{ language | lower }}
             {% if raw %}<a href="{{ raw }}">raw</a>{% endif %}
             {% if original %}<a href="{{ url_for('show_paste', id=original) }}">original</a>{% endif %}
-            <a href="{{ url_for('repaste', id=original) }}">repaste</a>
+            <a href="{{ url_for('repaste', id=id) }}">repaste</a>
         </nav>
     </body>
 </html>
