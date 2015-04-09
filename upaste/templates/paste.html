@@ -25,7 +25,7 @@
         <nav>
             {{ language | lower }}
             {% if raw %}<a href="{{ raw }}">raw</a>{% endif %}
-            {% if original %}<a href="/{{ original }}">original</a> <a href="/diff/{{ original }}">diff</a>{% endif %}
+            {% if original %}<a href="/{{ original }}">original</a>{% endif %}
             <a href="/repaste/{{ id }}">repaste</a>
         </nav>
     </body>
