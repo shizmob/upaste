@@ -19,7 +19,7 @@ app = Flask(__name__)
 def index(id=None):
 	if id:
 		id = sanitize_id(id)
-		if not id_taken(id):
+		if not id_exists(id):
 			abort(404)
 		contents, language, _ = get_file(id)
 	else:
@@ -49,10 +49,10 @@ def paste():
 @app.route('/<id>')
 def show_paste(id):
 	id = sanitize_id(id)
-	raw_file = raw_from_id(id)
-	if not id_taken(id):
+	if not id_exists(id):
 		abort(404)
 
+	raw_file = raw_from_id(id)
 	source, language, original_id = get_file(id)
 	full_language = config.LANGUAGES.get(language, 'Unknown')
 
@@ -66,44 +66,10 @@ def show_paste(id):
 	return render_template('paste.html', id=id, language=language, full_language=full_language, stylesheet=stylesheet, code=highlighted, raw=raw_file, original=original_id)
 
 
-
-def normalize_language_description(x):
-	key, val = x
-	return val.lstrip('. /#').lower()
-
-def sanitize_id(id):
-	return path.basename(id)
-
-def id_taken(id):
-	return path.exists(file_from_id(id))
-
-def generate_free_id():
-	while True:
-		rand = getrandbits(config.ID_RAND_BITS)
-		randbytes = rand.to_bytes(int(config.ID_RAND_BITS / 8), 'little')
-		hash = sha256(randbytes).hexdigest().encode('utf-8')
-
-		id = b64encode(hash)[:config.ID_LENGTH].decode('ascii')
-		if not id_taken(id):
-			break
-
-	return id
-
-def file_from_id(id):
-	if id == 'self':
-		return __file__
-	return path.join(config.DATADIR, id + '.txt')
-
-def raw_from_id(id):
-	return path.join(config.EXTDATADIR, id + '.txt')
-
-
-
 def get_file(id):
 	source_file = file_from_id(id)
-
-	with open(source_file, 'r') as f:
-		source = f.read()
+	with open(source_file, 'rb') as f:
+		source = f.read().decode('utf-8')
 
 	try:
 		language = xattr.getxattr(source_file, 'user.upaste.language').decode('utf-8')
@@ -118,9 +84,43 @@ def get_file(id):
 
 def paste_file(id, contents, language=None, original_id=None):
 	target_file = file_from_id(id)
-	with open(target_file, 'w') as f:
-		f.write(contents)
+	contents = contents.replace('\r\n', '\n')
+	contents = contents.rstrip('\n') + '\n'
+	with open(target_file, 'wb') as f:
+		f.write(contents.encode('utf-8'))
 
 	xattr.setxattr(target_file, 'user.upaste.language', language.encode('utf-8'))
 	if original_id:
 		xattr.setxattr(target_file, 'user.upaste.original_id', original_id.encode('utf-8'))
+
+
+def normalize_language_description(x):
+	key, val = x
+	return val.lstrip('. /#').lower()
+
+def generate_free_id():
+	while True:
+		rand = getrandbits(config.ID_RAND_BITS)
+		randbytes = rand.to_bytes(int(config.ID_RAND_BITS / 8), 'little')
+		hash = sha256(randbytes).hexdigest().encode('utf-8')
+
+		id = b64encode(hash)[:config.ID_LENGTH].decode('ascii')
+		if not id_exists(id):
+			break
+
+	return id
+
+def id_exists(id):
+	return path.exists(file_from_id(id))
+
+def sanitize_id(id):
+	return path.basename(id)
+
+def file_from_id(id):
+	if id == 'self':
+		return __file__
+	return path.join(config.DATADIR, id + '.txt')
+
+def raw_from_id(id):
+	return path.join(config.EXTDATADIR, id + '.txt')
+
